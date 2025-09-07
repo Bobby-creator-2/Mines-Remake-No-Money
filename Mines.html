@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mines — By Dinononosaur 🦕</title>
+  <style>
+    :root{--bg:#071023;--panel:#0b1220;--muted:#94a3b8;--accent:#60a5fa;--good:#16a34a}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial}
+    body{
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+      min-height:100vh;
+      overflow-y:auto;
+      background:linear-gradient(180deg,#031024 0%,#071023 100%);
+      color:#e6eef8;
+    }
+    .app{width:min(1100px,96vw);display:grid;grid-template-columns:360px 1fr;gap:20px;padding:28px; display:none;}
+    .card{background:var(--panel);border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(2,6,23,.6)}
+    h2{margin:0 0 10px;font-size:18px} /* increased gap below title */
+    .muted{color:var(--muted);font-size:13px;margin-bottom:12px} /* gap between subtitle and balance */
+    .balance{font-size:22px;margin:12px 0 8px 0;} /* increased gap above balance */
+    label{display:block;font-size:13px;margin-top:10px;color:var(--muted)}
+    input[type=number]{width:100%;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .mines-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px}
+    .cell{aspect-ratio:1/1;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,0.03);cursor:pointer;user-select:none;font-weight:600;transition:background 0.2s}
+    .cell.revealed.safe{background:rgba(22,163,74,0.35);color:#bfffcf}
+    .cell.revealed.mine{background:rgba(220,38,38,0.25);color:#ffdddd}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    button{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;cursor:pointer;font-size:16px;font-weight:600}
+    .primary{background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;border:none;flex:1}
+    .danger{background:linear-gradient(90deg,#ef4444,#fb7185);color:#fff;border:none}
+    .info{font-size:18px;margin-top:14px;} /* larger text for multiplier/profit */
+    .info strong{font-size:20px}
+    .row{display:flex;gap:8px;align-items:center}
+    .footer{grid-column:1/-1;margin-top:12px;color:var(--muted);font-size:13px}
+
+    /* Slider styles */
+    #mineSlider{
+      width: 100%;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      -webkit-appearance: none;
+      background: rgba(255,255,255,0.05);
+      height: 8px;
+      border-radius: 4px;
+      outline: none;
+    }
+    #mineSlider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 4px rgba(0,0,0,0.5)}
+    #mineSlider::-moz-range-thumb{width:18px;height:18px;background:var(--accent);border-radius:50%;cursor:pointer;box-shadow:0 0 4px rgba(0,0,0,0.5)}
+
+    /* Popup styles */
+    #popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;z-index:1000;}
+    #popup.hidden{display:none;}
+    .popup-content{background:var(--panel);color:white;padding:20px 30px;border-radius:12px;text-align:center;box-shadow:0 0 15px rgba(0,0,0,0.7);max-width:300px;}
+    #popup-close{margin-top:12px;padding:8px 16px;background:var(--good);border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer;}
+    #popup-close:hover{background:#15803d;}
+
+    /* Password prompt styles */
+    #passwordPrompt{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;z-index:1000;}
+    #passwordPrompt .card{width:320px;text-align:center;}
+    #passwordPrompt input{width:80%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);margin-top:10px;}
+  </style>
+</head>
+<body>
+
+  <!-- Password Prompt -->
+  <div id="passwordPrompt">
+    <div class="card">
+      <h2>Enter Password</h2>
+      <input type="password" id="passwordInput" placeholder="Password" autocomplete="off" />
+      <div class="row" style="justify-content:center;margin-top:12px;">
+        <button id="passwordBtn" class="primary">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mines Game -->
+  <div class="app" id="gameApp">
+    <div class="card">
+      <h2>Mines — By Dinononosaur 🗿</h2>
+      <div class="muted">Do not get addicted... nevermind gimme ur money.</div>
+      <div class="balance"><strong>Balance:</strong> <strong id="balance">1000</strong> coins</div>
+
+      <label>Bet amount</label>
+      <input id="bet" type="number" min="1" step="1" value="10" />
+
+      <label>Number of mines: <span id="mineDisplay">3</span></label>
+      <input type="range" id="mineSlider" min="1" max="24" value="3" step="1">
+
+      <div class="row">
+        <button id="allInBtn" class="danger">All In</button>
+        <button id="resetBal">Reset Balance</button>
+      </div>
+
+      <div class="info">
+        <div>Current multiplier: <strong id="multiplier">1.00x</strong></div>
+        <div>Profit: <strong id="payout">0</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Clicky grid area thingy</h2>
+      <div class="muted">Click a place and see if ur lucky. Click <em>Cashout</em> to take current profit before hitting a mine.</div>
+
+      <div id="board" class="mines-grid" style="margin-top:12px"></div>
+
+      <div class="controls">
+        <button id="cashout" class="primary">Cashout</button>
+        <button id="newRound" class="primary">Bet</button>
+        <div style="margin-left:auto;color:var(--muted);align-self:center">Safe picks: <span id="safeCount">0</span></div>
+      </div>
+    </div>
+
+    <div class="footer card" style="padding:12px">Notes: Grid is 5×5 (25 tiles). You pick tiles; some contain mines. The multiplier is calculated from probabilities (fair inverse of survival probability). This is for entertainment only.</div>
+  </div>
+
+  <!-- Popup element -->
+  <div id="popup" class="hidden">
+    <div class="popup-content">
+      <p id="popup-message"></p>
+      <button id="popup-close">OK</button>
+    </div>
+  </div>
+
+  <script>
+   
+    const passwordInput = document.getElementById("passwordInput");
+    const passwordBtn = document.getElementById("passwordBtn");
+    const gameApp = document.getElementById("gameApp");
+    const passwordPrompt = document.getElementById("passwordPrompt");
+
+    const encodedBase64 = "RGlub25vbm9zYXVy";
+
+    function cleanInput(s){
+      // remove zero-width spaces and trim
+      return s.replace(/[\u200B-\u200D\uFEFF]/g,'').trim();
+    }
+
+    function tryUnlock(){
+      const val = cleanInput(passwordInput.value);
+      console.log("DEBUG: entered:", JSON.stringify(val), "decoded target:", atob(encodedBase64));
+      if(val === atob(encodedBase64)){
+        gameApp.style.display = "grid";
+        passwordPrompt.style.display = "none";
+      } else {
+        alert("Incorrect password!");
+        passwordInput.value = "";
+        passwordInput.focus();
+      }
+    }
+
+    passwordBtn.addEventListener('click', tryUnlock);
+    passwordInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') tryUnlock(); });
+
+    // ---- MINES GAME SCRIPT ----
+    const GRID_SIZE = 25;
+    let balance = 1000, bet = 10, mines = 3, revealed = new Set(), minesSet = new Set(), inRound = false, safePicks = 0;
+
+    const balanceEl = document.getElementById('balance');
+    const betEl = document.getElementById('bet');
+    const allInBtn = document.getElementById('allInBtn');
+    const boardEl = document.getElementById('board');
+    const multiplierEl = document.getElementById('multiplier');
+    const payoutEl = document.getElementById('payout');
+    const cashoutBtn = document.getElementById('cashout');
+    const newRoundBtn = document.getElementById('newRound');
+    const safeCountEl = document.getElementById('safeCount');
+    const resetBalBtn = document.getElementById('resetBal');
+    const mineSlider = document.getElementById('mineSlider');
+    const mineDisplay = document.getElementById('mineDisplay');
+    const popup = document.getElementById('popup');
+    const popupMessage = document.getElementById('popup-message');
+    const popupClose = document.getElementById('popup-close');
+
+    function showPopup(message){ popupMessage.textContent = message; popup.classList.remove('hidden'); }
+    popupClose.onclick = () => { popup.classList.add('hidden'); };
+
+    mineSlider.oninput = () => { mines = Number(mineSlider.value); mineDisplay.textContent = mines; updateUI(); };
+
+    function init(){
+      balanceEl.textContent = balance.toFixed(0);
+      betEl.value = bet;
+      boardEl.innerHTML = '';
+      for(let i=0;i<GRID_SIZE;i++){
+        const c = document.createElement('div');
+        c.className = 'cell';
+        c.dataset.index = i;
+        c.onclick = onCellClick;
+        boardEl.appendChild(c);
+      }
+      updateUI();
+    }
+
+    function updateUI(){
+      balanceEl.textContent = balance.toFixed(0);
+      multiplierEl.textContent = computeMultiplier().toFixed(4) + 'x';
+      const profit = (computeMultiplier() * (betEl.value||0) - (betEl.value||0));
+      payoutEl.textContent = profit.toFixed(2) + ' coins';
+      safeCountEl.textContent = safePicks;
+    }
+
+    function startRound(){
+      bet = Math.max(1, Number(betEl.value) || 1);
+      if (inRound) return showPopup('Round already in progress');
+      if (bet > balance) return showPopup('Not enough balance');
+      balance -= bet;
+      inRound = true;
+      revealed.clear(); minesSet.clear(); safePicks = 0;
+      while (minesSet.size < mines){
+        minesSet.add(Math.floor(Math.random() * GRID_SIZE));
+      }
+      Array.from(boardEl.children).forEach(c => { c.className='cell'; c.textContent=''; });
+      updateUI();
+    }
+
+    function endRound(win, payout){
+      inRound = false;
+      minesSet.forEach(m => {
+        const el = boardEl.children[m];
+        if (el) { el.classList.add('revealed','mine'); el.textContent='💣'; }
+      });
+      Array.from(boardEl.children).forEach((c, idx) => {
+        if (!minesSet.has(idx) && !c.classList.contains('safe')) {
+          c.className='cell'; c.textContent='';
+        }
+      });
+      if (win) {
+        balance += payout;
+        showPopup('Gooood Boooyy!');
+      } else {
+        showPopup('WHOMP WHOMP!');
+      }
+      updateUI();
+    }
+
+    function onCellClick(e){
+      if (!inRound) return showPopup('Click Bet to start a round');
+      const idx = Number(e.currentTarget.dataset.index);
+      if (revealed.has(idx)) return;
+      revealed.add(idx);
+      const cell = e.currentTarget;
+      if (minesSet.has(idx)){
+        cell.classList.add('revealed','mine'); cell.textContent='💣';
+        minesSet.forEach(m => { const el = boardEl.children[m]; if (el && !el.classList.contains('mine')){ el.classList.add('revealed','mine'); el.textContent='💣'; } });
+        endRound(false, 0);
+      } else {
+        cell.classList.add('revealed','safe');
+        safePicks++;
+        updateUI();
+      }
+    }
+
+    function computeMultiplier(){
+      let surv = 1;
+      for (let i=0;i<safePicks;i++){
+        surv *= ( (GRID_SIZE - mines - i) / (GRID_SIZE - i) );
+      }
+      let fair = surv>0 ? (1 / surv) : 0;
+      return Math.max(1, fair);
+    }
+
+    cashoutBtn.onclick = () => {
+      if (!inRound) return showPopup('No round in progress');
+      const mult = computeMultiplier();
+      const payout = bet * mult;
+      endRound(true, payout);
+    };
+
+    newRoundBtn.onclick = () => { startRound(); };
+    resetBalBtn.onclick = () => { balance = 1000; updateUI(); };
+    allInBtn.onclick = () => { betEl.value = balance; startRound(); };
+
+    // initialize (game will remain hidden until correct password)
+    init(); updateUI();
+
+// === CHEAT MODE ===
+const cheatBtn = document.createElement("button");
+cheatBtn.textContent = "Cheat Mode (OFF)";
+cheatBtn.className = "danger";
+cheatBtn.style.display = "none"; 
+cheatBtn.style.marginTop = "10px";
+cheatBtn.style.opacity = "0";            // invisible until hover
+cheatBtn.style.transition = "opacity 0.3s";
+
+// Put button in balance card
+const balanceCard = document.querySelector("#gameApp .card");
+balanceCard.appendChild(cheatBtn);
+
+let cheatActive = false;
+
+cheatBtn.onclick = () => {
+  if (!inRound) return showPopup("Start a round first!");
+  cheatActive = !cheatActive;
+
+  if (cheatActive) {
+    cheatBtn.textContent = "Cheat Mode (ON)";
+    Array.from(boardEl.children).forEach((c, idx) => {
+      if (revealed.has(idx)) return;
+      if (minesSet.has(idx)) {
+        c.style.outline = "2px solid red";
+      } else {
+        c.style.outline = "2px solid lime";
+      }
+    });
+  } else {
+    cheatBtn.textContent = "Cheat Mode (OFF)";
+    Array.from(boardEl.children).forEach((c, idx) => {
+      if (revealed.has(idx)) return;
+      c.style.outline = "none";
+    });
+  }
+};
+
+// Expose cheat code in console
+window.jholder = function(){
+  cheatBtn.style.display = "block";
+  cheatBtn.style.width = "100%";
+
+  // Hover-only visibility
+  cheatBtn.onmouseenter = () => cheatBtn.style.opacity = "1";
+  cheatBtn.onmouseleave = () => cheatBtn.style.opacity = "0";
+
+  console.log("%cCheat button unlocked! (hover to reveal)", "color: lime; font-size:16px;");
+};
+
+
+
+  </script>
+</body>
+</html>
