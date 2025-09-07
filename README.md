@@ -1,6 +1,6 @@
 # Mines — By Dinononosaur 🦕
 
-A fun and interactive Mines-style game inspired by online betting game- Stake. Click tiles to find safe spots and avoid mines. Cash out before hitting a mine to secure your profit!
+A fun and interactive Mines-style game inspired by online betting game- Stake. Click tiles to find safe spots and avoid mines. Cash out before hitting a mine to secure your profit! DISClAIMER: By using this script you agree to the terms of services.
 
 ---
 
