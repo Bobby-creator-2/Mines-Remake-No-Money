@@ -1,26 +1,66 @@
-Copyright (c) 2025 Conor Khoo (Dinononosaur)
+Copyright (c) 2025 Bobby-creator-2. All rights reserved.
 
-Mines — By Dinononosaur 🦕
+End User License Agreement (EULA) / Terms of Use
+Effective Date: 2025-09-07
 
-License for Use and Distribution:
+1. License Grant
+----------------
+Subject to the terms below, you ("User") are granted a non-exclusive, non-transferable,
+temporary license to use this software or service. This license is valid only when you
+possess a valid API key issued by the owner. Keys are valid for 48 hours and expire automatically.
 
-1. Personal and Non-Commercial Use Only
-   - You may use this software for personal, non-commercial purposes only.
-   - You may not sell, redistribute, or use it commercially without explicit written permission from the copyright holder.
+2. API Key Use
+--------------
+1. API keys are tied to your subscription or verification status.
+2. Keys cannot be shared, sold, or distributed to any third party.
+3. Expired keys will not grant access. Continued access requires a new, valid key.
+4. The owner reserves the right to revoke keys at any time for violations.
 
-2. No Tampering With Security Features
-   - All password protection, cheat detection, and security mechanisms must not be bypassed, modified, or disabled.
-   - Attempting to circumvent password or cheat restrictions is prohibited.
+3. Prohibition on Tampering
+---------------------------
+You are strictly prohibited from:
+1. Using artificial intelligence, scripts, or automated tools to bypass key verification.
+2. Modifying, editing, reverse engineering, decompiling, or disassembling the code to gain unauthorized access.
+3. Circumventing key expiration, subscription verification, or usage limits.
 
-3. No AI or Automated Modification
-   - You are strictly prohibited from using AI tools (including, but not limited to, ChatGPT, Copilot, or other generative software) to modify, reverse-engineer, or reveal restricted information such as passwords or cheat codes.
+Any violation may result in immediate revocation of access and potential legal action.
 
-4. Modifications
-   - You may modify the software for personal use only.
-   - You must not redistribute modified versions without written permission from the copyright holder.
+4. Commercial Use and Redistribution
+------------------------------------
+1. This software is licensed for personal use only.
+2. You may not sell, rent, lease, or distribute the software or modified versions.
+3. Sharing edited or patched versions of the software is strictly prohibited.
 
-5. Disclaimer
-   - This software is provided "as-is" for entertainment purposes only.
-   - The author is not responsible for any damage, financial loss, or other consequences resulting from its use.
+5. Ownership and Copyright
+--------------------------
+1. All rights, title, and interest in the software, code, and associated assets remain the sole property of the owner.
+2. This license does not grant ownership, only limited use.
+3. Copyright © 2025 ConorKhoo. All rights reserved.
 
-By using this software, you agree to comply with all the terms outlined in this license.
+6. Liability Disclaimer
+----------------------
+1. The software is provided "as-is" without warranty of any kind, express or implied.
+2. The owner is not liable for any damages, losses, or misuse arising from the software.
+3. Users assume all risks related to use, including key expiration or access issues.
+
+7. Enforcement
+--------------
+1. Violations of these terms may result in:
+   - Revocation of access or API keys
+   - Legal action for copyright infringement, unauthorized access, or breach of contract
+2. Users agree to comply with all applicable laws and regulations while using the software.
+
+8. Privacy
+----------
+1. Any personal information collected (emails, subscription status, usage logs) is used solely for managing subscriptions and keys.
+2. Your data will not be shared with third parties except as required by law.
+
+9. Modifications to Terms
+-------------------------
+The owner reserves the right to update or modify this agreement at any time. Continued use
+of the software constitutes acceptance of any changes.
+
+10. Acceptance
+--------------
+By using this software or service, you acknowledge that you have read, understood, and
+agreed to all terms outlined in this EULA.
